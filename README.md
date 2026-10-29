@@ -1,70 +1,82 @@
-# Lipid Tracking in Membrane Simulations
+# Lipid Tracking and Membrane Diffusion Analysis
 
 A Python project developed for a computational biology examination
-to analyse lipid motion in a membrane molecular-dynamics trajectory
-provided as a multi-model PDB file.
+to analyse lipid motion in a membrane molecular-dynamics trajectory.
 
-## Overview
+The project combines molecular tracking, lateral mean-squared
+displacement (MSD) calculations, visualisation, and comparison
+with GROMACS-generated MSD data.
 
-The script uses MDAnalysis to select membrane components by residue
-name and track their centres of mass over time.
+## Features
 
-Implemented routines include:
+- Selection of CHL, DAPC, and DSPC residues using MDAnalysis.
+- Tracking of residue centres of mass.
+- Lateral MSD calculation in the membrane XY plane.
+- Averaging over multiple time origins for each lag time.
+- Subtraction of the all-atom centre of mass to account for drift.
+- Per-molecule CSV output and lipid-type averages.
+- Linear fitting and comparison with GROMACS MSD output.
+- Interactive trajectory animations.
 
-- Tracking of CHL, DAPC, and DSPC residues.
-- Interactive XY trajectory animations for selected lipid types.
-- Selection of upper, lower, or both membrane leaflets.
-- An XZ trajectory animation for CHL.
-- Calculation and CSV export of lateral squared displacements.
-- Plotting and linear fitting of displacement data.
+## Files
+
+| File | Purpose |
+|------|---------|
+| `MDLipid.py` | Full lag-time MSD calculation and CSV export. |
+| `Auswertung.py` | CHL MSD plotting, linear fitting, and comparison with GROMACS output. |
+| `LipidTracking.py` | Command-line version with analysis and animation routines; its current MSD loop evaluates only one lag. |
+| `Complete.py` | Combined development version of the analysis and animation routines. |
+| `Animation.py` | Early standalone animation draft. |
 
 ## Requirements
 
-- Python
-- MDAnalysis
-- NumPy
-- Matplotlib
+Python packages:
 
 ```bash
-pip install MDAnalysis numpy matplotlib
+pip install numpy matplotlib MDAnalysis
 ```
 
-## Usage
+The early `Animation.py` draft also imports pandas.
+
+## Main analysis workflow
+
+Place the multi-model PDB trajectory in the working directory as
+`mem.pdb`, then run:
 
 ```bash
-python LipidTracking.py data
-python LipidTracking.py plots
-python LipidTracking.py xy
-python LipidTracking.py xz
+python MDLipid.py
 ```
 
-The `data`, `xy`, and `xz` routines prompt for the trajectory path.
-The XY routine additionally requests the residue name and leaflet.
+This generates:
 
-The input must provide multiple trajectory frames, the residue names
-`CHL`, `DAPC`, and `DSPC`, and suitable atomic masses for
-centre-of-mass calculations.
+- `CHL.csv`
+- `DAPC.csv`
+- `DSPC.csv`
 
-## Output
+Each CSV stores lag times along rows and individual molecules
+along columns. Coordinates are converted from angstroms to
+nanometres before calculating squared displacements.
 
-- `CHL.csv`, `DAPC.csv`, `DSPC.csv` — displacement-analysis arrays.
-- `MSD.png` — displacement plots and linear fits.
-- Interactive Matplotlib windows displaying lipid trajectories.
+To compare the CHL results with GROMACS output, also provide
+`msd_CHOL.xvg` and run:
 
-## Project status
+```bash
+python Auswertung.py
+```
 
-This repository documents an examination project, not a validated
-general-purpose analysis package.
+Trajectory and reference-output files must be supplied separately.
 
-The original code assumes 201 trajectory frames and a 100 ps frame
-spacing in its plotting routine. The displacement calculation currently
-evaluates only a single-frame lag; a complete lag-dependent MSD analysis
-requires extending this loop.
+## Assumptions and project status
 
-Before quantitative use, the plotting code, CSV-to-residue mapping,
-diffusion-coefficient calculation, and periodic-boundary handling
-require correction or verification.
+This repository contains the original examination scripts and
+development versions, not a validated general-purpose package.
 
-Leaflet membership is assigned using the mean Z coordinate of the
-selected lipid type at the initially loaded frame and is kept fixed
-during animation.
+The MSD calculation assumes 201 trajectory frames. The plotting
+scripts assume a frame spacing of 100 ps.
+
+Before quantitative interpretation, the diffusion-coefficient
+conversion, fitting interval, periodic-boundary treatment, and
+consistency with the GROMACS reference analysis require verification.
+
+Some development scripts contain known syntax or implementation
+issues and need correction before execution.
