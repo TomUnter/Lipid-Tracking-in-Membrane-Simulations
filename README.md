@@ -2,7 +2,7 @@
 
 Lateral diffusion of lipids in a membrane simulation: per-lipid mean squared displacement (MSD),
 diffusion coefficients from a linear fit, and animated centre-of-mass tracks.
-Developed from my master's thesis project (Python, MDAnalysis, NumPy).
+Master course project (Python, MDAnalysis, NumPy).
 
 ## What it does
 
